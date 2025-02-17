@@ -2,6 +2,7 @@
 # Author: Graham Cockerham
 
 import csv
+
 import datetime
 
 # loading address.csv file
@@ -226,48 +227,61 @@ package_delivery(truck3)
 
 
 class Main:
-    @staticmethod
-    def run():
-        # user interface
-        print("WGUPS - Western Governors University Parcel Service")  # user greeting
-        print("Total mileage driven is: ",
-              truck1.miles + truck2.miles + truck3.miles)  # showing total mileage driven by the 3 trucks
+    # user interface
+    print("WGUPS - Western Governors University Parcel Service")  # user greeting
+    print("Total mileage driven is: ",
+          truck1.miles + truck2.miles + truck3.miles)  # showing total mileage driven by the 3 trucks
 
-        # user menu
-        print("Please select an option:")
-        print("1. View status of packages")
-        print("2. Quit")
-        user_choice = input("Enter your choice: ")
+    # user menu
+    print("Please select an option:")
+    print("1. View status of a specific package")
+    print("2. View status of all packages at a specific time")
+    print("3. Quit")
+    user_choice = input("Enter your choice: ")
 
-        if user_choice == "1":
-            time_request = input("To see a time status update of each package, enter the time in HH:MM format.")
-            # input format validation
-            while True:
-                if ":" not in time_request:
-                    print("Invalid time format. Please use HH:MM format.")
-                    continue  # Prompt again
+    if user_choice == "1":
+        package_input = input("Enter package ID to check the status (or enter 0 to exit): ")
+        while True:
+            try:
+                package_id = int(package_input)
+                if package_id == 0:
+                    print("Thank you for using WGUPS. Goodbye!")
+                    break
 
-                try:
-                    (h, m) = time_request.split(":")
-                    timechange = datetime.timedelta(hours=int(h), minutes=int(m))
-                except ValueError:
-                    print("Invalid time format. Make sure to use numeric values in HH:MM format.")
-                    continue  # Prompt again
-
-                try:
-                    package_input = [int(input("Enter package ID."))]
-                except ValueError:
-                    package_input = range(1, 41)
-
-                for package_id in package_input:
-                    package = package_hash.search(package_id)
-                    if package is not None:  # only updating status if the package exists
-                        package.update_status(timechange)
+                package = package_hash.search(package_id)
+                if package is not None:  # only updating status if the package exists
+                    time_request = input("Enter the time in HH:MM format to check status: ")
+                    try:
+                        (h, m) = time_request.split(":")
+                        timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
+                        package.update_status(timeChange)
                         print(str(package))
-                    else:
-                        print(f"Package ID {package_id} not found in the hash table.")
+                    except ValueError:
+                        print("Invalid time format. Please use HH:MM format.")
+                else:
+                    print(f"Package ID {package_id} not found in the hash table.")
+                package_input = input("Enter another package ID to check the status (or enter 0 to exit): ")
+            except ValueError:
+                print("Invalid input. Please enter a valid Package ID.")
+                package_input = input("Enter package ID to check the status (or enter 0 to exit): ")
 
-        if user_choice == "2":
-            while True:
-                print("Thank you for using WGUPS. Goodbye!")
-                import datetime
+    if user_choice == "2":
+        time_request = input("Enter the time in HH:MM format to check the status of all packages: ")
+        while True:
+            try:
+                (h, m) = time_request.split(":")
+                timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
+                for package_id in range(1, 41):  # Assuming package IDs are in the range 1-40
+                    package = package_hash.search(package_id)
+                    if package is not None:
+                        package.update_status(timeChange)
+                        print(str(package))
+                break
+            except ValueError:
+                print("Invalid time format. Please use HH:MM format.")
+                time_request = input("Enter the time in HH:MM format to check the status of all packages: ")
+
+    if user_choice == "3":
+        while True:
+            print("Thank you for using WGUPS. Goodbye!")
+            quit()
