@@ -97,12 +97,10 @@ class PackageFunction:
             self.status = "On the way"
         else:
             self.status = "Delivered"
-        if time_change > datetime.timedelta(hours=10, minutes=20):
+        # Update address and zip code for Package 9 if the incorrect one is detected and time is after 10:20 a.m.
+        if self.package_id == 9 and time_change >= datetime.timedelta(hours=10, minutes=20):
             self.address = "410 S State St"
             self.zip_code = "84111"
-        else:
-            self.address = "300 State St"
-            self.zip_code = "84103"
 
 
 # loading packages infor from csv file to insert into hash table
@@ -235,7 +233,7 @@ class Main:
     # user menu
     print("Please select an option:")
     print("1. View status of a specific package")
-    print("2. View status of all packages at a specific time")
+    print("2. View which packages are on the way on each truck")
     print("3. Quit")
     user_choice = input("Enter your choice: ")
 
@@ -256,6 +254,20 @@ class Main:
                         timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
                         package.update_status(timeChange)
                         print(str(package))
+
+                        # Print the truck location based on the package's delivery time
+                        truck_current_location = None
+                        if package_id in truck1.packages:
+                            truck_current_location = truck1.current_location
+                        elif package_id in truck2.packages:
+                            truck_current_location = truck2.current_location
+                        elif package_id in truck3.packages:
+                            truck_current_location = truck3.current_location
+
+                        if truck_current_location:
+                            print(f"Truck current location at {time_request}: {truck_current_location}")
+                        else:
+                            print("Truck location unknown at the specified time.")
                     except ValueError:
                         print("Invalid time format. Please use HH:MM format.")
                 else:
@@ -266,22 +278,45 @@ class Main:
                 package_input = input("Enter package ID to check the status (or enter 0 to exit): ")
 
     if user_choice == "2":
-        time_request = input("Enter the time in HH:MM format to check the status of all packages: ")
-        while True:
-            try:
-                (h, m) = time_request.split(":")
-                timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
-                for package_id in range(1, 41):  # Assuming package IDs are in the range 1-40
-                    package = package_hash.search(package_id)
-                    if package is not None:
-                        package.update_status(timeChange)
+        time_request = input("Enter the time in HH:MM format to check package statuses: ")
+        try:
+            (h, m) = time_request.split(":")
+            time_change = datetime.timedelta(hours=int(h), minutes=int(m))
+            print("Packages currently on the way for each truck (en route):")
+            print("Truck 1:")
+            for package_id in truck1.packages:
+                package = package_hash.search(package_id)
+                if package:
+                    package.update_status(time_change)  # Updating package status based on entered time
+                    if package.status == "On the way":
+                        print(
+                            f"Package ID {package.package_id} on the way to {package.address}, ZIP: {package.zip_code}")
+            print("\nTruck 2:")
+            for package_id in truck2.packages:
+                package = package_hash.search(package_id)
+                if package:
+                    package.update_status(time_change)
+                    if package.status == "On the way":
                         print(str(package))
-                break
-            except ValueError:
-                print("Invalid time format. Please use HH:MM format.")
-                time_request = input("Enter the time in HH:MM format to check the status of all packages: ")
+            print("\nTruck 3:")
+            for package_id in truck3.packages:
+                package = package_hash.search(package_id)
+                if package:
+                    package.update_status(time_change)
+                    if package.status == "On the way":
+                        print(str(package))
+        except ValueError:
+            print("Invalid time format. Please use HH:MM format.")
 
-    if user_choice == "3":
+        # Return to menu
+        print("\nPlease select another option:")
+        print("1. View status of a specific package")
+        print("2. View which packages are on the way on each truck")
+        print("3. Quit")
+        user_choice = input("Enter your choice: ")
+
+
+    elif user_choice == "3":
         while True:
             print("Thank you for using WGUPS. Goodbye!")
             quit()
