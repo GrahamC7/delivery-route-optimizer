@@ -1,5 +1,6 @@
-# Author: Graham Cockerham
 # Student ID: 001146093
+# Author: Graham Cockerham
+
 import csv
 import datetime
 
@@ -155,6 +156,7 @@ def address_info(address_main):
             return int(row[0])
 
 
+# loading hash table with packages
 load_packages("CSV_Files/packages.csv", package_hash)
 
 
@@ -176,7 +178,7 @@ class Trucks:
 # manually loading the trucks and assigning them a departure time
 truck1 = Trucks(18, 0.0, "4001 South 700 East", datetime.timedelta(hours=8),
                 [1, 13, 14, 15, 16, 19, 20, 27, 29, 30, 31, 34, 37, 40])
-truck2 = Trucks(18, 0.0, "4001 South 700 East", datetime.timedelta(hours=11),
+truck2 = Trucks(18, 0.0, "4001 South 700 East", datetime.timedelta(hours=10, minutes=20),
                 [2, 3, 4, 5, 9, 18, 26, 28, 32, 35, 36, 38])
 truck3 = Trucks(18, 0.0, "4001 South 700 East", datetime.timedelta(hours=9, minutes=5),
                 [6, 7, 8, 10, 11, 12, 17, 21, 22, 23, 24, 25, 33, 39])
@@ -205,52 +207,67 @@ def package_delivery(truck):
             if between_address(address_info(truck.current_location), address_info(package.address)) <= next_address:
                 next_address = between_address(address_info(truck.current_location), address_info(package.address))
                 next_package = package
-        truck.packages.append(next_package.package_id)
-        not_delivered.remove(next_package)
-        truck.miles += next_address
-        truck.current_location = next_package.address
-        truck.time += datetime.timedelta(hours=next_address / 18)
+        truck.packages.append(next_package.package_id)  # adding next closest package to deliver to the truck's list
+        not_delivered.remove(next_package)  # removing the above package from the list "not_delivered"
+        truck.miles += next_address  # adding mileage driven to deliver this package to "next_address"
+        truck.current_location = next_package.address  # updating truck's location according to the package that was delivered
+        truck.time += datetime.timedelta(
+            hours=next_address / 18)  # updating the time according to how long the truck drove to deliver the package
         next_package.delivery_time = truck.time
         next_package.departure_time = truck.departure_time
 
 
-# commencing delivery of packages via trucks
+# commencing loading of trucks and delivery of packages
 package_delivery(truck1)
 package_delivery(truck2)
 truck3.departure_time = min(truck1.time,
-                            truck2.time)  # truck 3 will not leave WGUPS until truck1 or truck2 have returned - there are only 2 drivers
+                            truck2.time)  # truck 3 will not leave the WGUPS hub until truck1 or truck2 have returned - there are only 2 drivers
 package_delivery(truck3)
 
-# user interface
-print("WGUPS - Western Governors University Parcel Service")
-# showing total mileage driven by the 3 trucks
-print("Total mileage driven is: ", truck1.miles + truck2.miles + truck3.miles)
 
-while True:
-    # printing combined mileage for the 3 trucks
-    time_request = input("To see a time status update of each package, enter the time in HH:MM format.")
+class Main:
+    @staticmethod
+    def run():
+        # user interface
+        print("WGUPS - Western Governors University Parcel Service")  # user greeting
+        print("Total mileage driven is: ",
+              truck1.miles + truck2.miles + truck3.miles)  # showing total mileage driven by the 3 trucks
 
-    # input format validation
-    if ":" not in time_request:
-        print("Invalid time format. Please use HH:MM format.")
-        continue  # Prompt again
+        # user menu
+        print("Please select an option:")
+        print("1. View status of packages")
+        print("2. Quit")
+        user_choice = input("Enter your choice: ")
 
-    try:
-        (h, m) = time_request.split(":")
-        timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
-    except ValueError:
-        print("Invalid time format. Make sure to use numeric values in HH:MM format.")
-        continue  # Prompt again
+        if user_choice == "1":
+            time_request = input("To see a time status update of each package, enter the time in HH:MM format.")
+            # input format validation
+            while True:
+                if ":" not in time_request:
+                    print("Invalid time format. Please use HH:MM format.")
+                    continue  # Prompt again
 
-    try:
-        user_entry = [int(input("Enter package ID."))]
-    except ValueError:
-        user_entry = range(1, 41)
+                try:
+                    (h, m) = time_request.split(":")
+                    timechange = datetime.timedelta(hours=int(h), minutes=int(m))
+                except ValueError:
+                    print("Invalid time format. Make sure to use numeric values in HH:MM format.")
+                    continue  # Prompt again
 
-    for package_id in user_entry:
-        package = package_hash.search(package_id)
-        if package is not None:  # only updating status if the package exists
-            package.update_status(timeChange)
-            print(str(package))
-        else:
-            print(f"Package ID {package_id} not found in the hash table.")
+                try:
+                    package_input = [int(input("Enter package ID."))]
+                except ValueError:
+                    package_input = range(1, 41)
+
+                for package_id in package_input:
+                    package = package_hash.search(package_id)
+                    if package is not None:  # only updating status if the package exists
+                        package.update_status(timechange)
+                        print(str(package))
+                    else:
+                        print(f"Package ID {package_id} not found in the hash table.")
+
+        if user_choice == "2":
+            while True:
+                print("Thank you for using WGUPS. Goodbye!")
+                import datetime
