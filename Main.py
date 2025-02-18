@@ -28,8 +28,7 @@ class HashTable:
         for i in range(initial_capacity):
             self.table.append([])
 
-        # inserting new item into hash table
-
+    # inserting new item into hash table
     def insert(self, key, item):
         bucket = hash(key) % len(self.table)
         bucket_list = self.table[bucket]
@@ -46,8 +45,7 @@ class HashTable:
         bucket_list.append(key_value)
         return True
 
-        # searching hash table for item that matches the key
-
+    # searching hash table for item that matches the key
     def search(self, key):
         bucket = hash(key) % len(self.table)
         bucket_list = self.table[bucket]
@@ -57,8 +55,7 @@ class HashTable:
                 return kv[1]  # if item is found
         return None  # if item is not found
 
-        # removal of item from hash table
-
+    # removal of item from hash table
     def hash_remove(self, key):
         bucket = hash(key) % len(self.table)
         bucket_list = self.table[bucket]
@@ -81,6 +78,7 @@ class PackageFunction:
         self.departure_time = None
         self.delivery_time = None
 
+    # method returning comma-separated string containing relevant package details
     def __str__(self):
         return "%s, %s, %s, %s, %s, %s, %s, %s, %s" % (
             self.package_id, self.address, self.city, self.state, self.zip_code, self.delivery_deadline,
@@ -148,7 +146,7 @@ def between_address(address1, address2):
         distance = DistanceCSV[address2][address1]
     return float(distance)
 
-
+# searching for specific address within AddressCSV and returning its index
 def address_info(address_main):
     for row in AddressCSV:
         if address_main in row[2]:
@@ -169,6 +167,7 @@ class Trucks:
         self.time = departure_time
         self.packages = packages  # Correctly assign packages as a list
 
+    # method to print truck details
     def __str__(self):
         return "%s, %s, %s, %s, %s, %s" % (
             self.speed, self.miles, self.current_location, self.departure_time, self.time, self.packages)
@@ -223,14 +222,17 @@ truck3.departure_time = min(truck1.time,
                             truck2.time)  # truck 3 will not leave the WGUPS hub until truck1 or truck2 have returned - there are only 2 drivers
 package_delivery(truck3)
 
+# class Main contains user interface
 class Main:
+    # constructor automatically calls user menu
     def __init__(self):
         self.run()
 
+    # method to run user interface menu
     def run(self):
-        while True:
+        while True: # looping user interface menu options until user chooses to quit
             print("\nWGUPS - Western Governors University Parcel Service")
-            print("=" * 60)
+            print("=" * 60) # creating visual separator in user menu for ease of readability
             print("1. View total mileage traveled by all trucks")
             print("2. Check the status of a specific package")
             print("3. Check the status of all packages at a specific time")
@@ -239,35 +241,37 @@ class Main:
             print("6. Exit program")
             print("=" * 60)
 
-            try:
-                # Get user selection
+            try: # try block - exception handling
+                # getting user selection
                 option = input("Select an option (1-6): ")
 
-                if option == "1":
-                    # Display total mileage of all trucks
+                if option == "1": # user selects option 1
+                    # displaying total mileage of all trucks
                     total_mileage = truck1.miles + truck2.miles + truck3.miles
                     print("\nTotal mileage traveled by all trucks: {:.2f} miles".format(total_mileage))
 
-                elif option == "2":
-                    # Check status of a specific package
+                elif option == "2": # user selects option 2
+                    # checking status of a specific package
                     package_id = int(input("Enter package ID (1-40): "))
                     package = package_hash.search(package_id)
 
+                    # checking if a package exists - if exists, retrieves user input for a time
                     if package:
                         time_request = input("Enter a time (HH:MM) to check package status: ")
                         h, m = map(int, time_request.split(":"))
                         time_change = datetime.timedelta(hours=h, minutes=m)
                         package.update_status(time_change)
 
-                        # Determine package location
+                        # determining package location
                         location = package.address if package.status == "Delivered" else "On Truck" if package.status == "On the way" else "WGUPS Hub"
 
-                        # Convert timedelta to HH:MM format
+                        # converting timedelta to HH:MM format
                         if package.delivery_time:
                             delivery_time = (datetime.datetime.min + package.delivery_time).time().strftime('%H:%M')
                         else:
                             delivery_time = "Not Delivered"
 
+                        # formatting and displaying package info
                         print("\nPackage Information")
                         print("-" * 50)
                         print(f"Package ID: {package_id}")
@@ -278,8 +282,8 @@ class Main:
                     else:
                         print("Invalid package ID. Please enter a number between 1 and 40.")
 
-                elif option == "3":
-                    # Check status of all packages at a specific time
+                elif option == "3": # user selects option 3
+                    # checking status of all packages at a specific time
                     time_request = input("Enter a time (HH:MM) to check package statuses: ")
                     h, m = map(int, time_request.split(":"))
                     time_change = datetime.timedelta(hours=h, minutes=m)
@@ -287,20 +291,22 @@ class Main:
                     print("\nPackage Status at", time_request)
                     print("=" * 60)
 
+                    # iterating through all packages and updating statuses
                     for package_id in range(1, 41):
                         package = package_hash.search(package_id)
                         package.update_status(time_change)
                         location = package.address if package.status == "Delivered" else "On Truck" if package.status == "On the way" else "WGUPS Hub"
 
-                        # Convert timedelta to HH:MM format
+                        # converting timedelta to HH:MM format
                         if package.delivery_time:
                             delivery_time = (datetime.datetime.min + package.delivery_time).time().strftime('%H:%M')
                         else:
                             delivery_time = "Not Delivered"
 
+                        # printing package information
                         print(f"Package {package_id}: {package.status} | Location: {location} | Delivery Time: {delivery_time} | Deadline: {package.delivery_deadline}")
 
-                elif option == "4":
+                elif option == "4": # user selects option 4
                     # Check the status of all packages on a specific truck at a specific time
                     truck_option = input("Enter truck number (1, 2, or 3): ")
 
@@ -329,13 +335,13 @@ class Main:
                     else:
                         print("Invalid truck selection. Please enter 1, 2, or 3.")
 
-                elif option == "5":
+                elif option == "5": # user selects option 5
                     # Show which packages are assigned to each truck
                     print("\nTruck 1 Packages:", truck1.packages)
                     print("Truck 2 Packages:", truck2.packages)
                     print("Truck 3 Packages:", truck3.packages)
 
-                elif option == "6":
+                elif option == "6": # user selects option 6
                     # Exit program
                     print("Exiting program. Thank you for using WGUPS!")
                     break
@@ -346,5 +352,5 @@ class Main:
             except ValueError:
                 print("Invalid input. Please enter the correct format.")
 
-# Automatically run when script is executed
+# instantiating Main class - automatically executes the init method
 Main()
