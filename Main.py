@@ -234,12 +234,14 @@ class Main:
             print("1. View total mileage traveled by all trucks")
             print("2. Check the status of a specific package")
             print("3. Check the status of all packages at a specific time")
-            print("4. Exit program")
+            print("4. Check the status of all packages on a specific truck at a specific time")
+            print("5. Show which packages are assigned to each truck")
+            print("6. Exit program")
             print("=" * 60)
 
             try:
                 # Get user selection
-                option = input("Select an option (1-4): ")
+                option = input("Select an option (1-6): ")
 
                 if option == "1":
                     # Display total mileage of all trucks
@@ -299,16 +301,50 @@ class Main:
                         print(f"Package {package_id}: {package.status} | Location: {location} | Delivery Time: {delivery_time} | Deadline: {package.delivery_deadline}")
 
                 elif option == "4":
+                    # Check the status of all packages on a specific truck at a specific time
+                    truck_option = input("Enter truck number (1, 2, or 3): ")
+
+                    if truck_option in ["1", "2", "3"]:
+                        time_request = input("Enter a time (HH:MM) to check truck package statuses: ")
+                        h, m = map(int, time_request.split(":"))
+                        time_change = datetime.timedelta(hours=h, minutes=m)
+
+                        truck = truck1 if truck_option == "1" else truck2 if truck_option == "2" else truck3
+
+                        print(f"\nPackage Status for Truck {truck_option} at {time_request}")
+                        print("=" * 60)
+
+                        for package_id in truck.packages:
+                            package = package_hash.search(package_id)
+                            package.update_status(time_change)
+                            location = package.address if package.status == "Delivered" else "On Truck" if package.status == "On the way" else "WGUPS Hub"
+
+                            # Convert timedelta to HH:MM format
+                            if package.delivery_time:
+                                delivery_time = (datetime.datetime.min + package.delivery_time).time().strftime('%H:%M')
+                            else:
+                                delivery_time = "Not Delivered"
+
+                            print(f"Package {package_id}: {package.status} | Location: {location} | Delivery Time: {delivery_time} | Deadline: {package.delivery_deadline}")
+                    else:
+                        print("Invalid truck selection. Please enter 1, 2, or 3.")
+
+                elif option == "5":
+                    # Show which packages are assigned to each truck
+                    print("\nTruck 1 Packages:", truck1.packages)
+                    print("Truck 2 Packages:", truck2.packages)
+                    print("Truck 3 Packages:", truck3.packages)
+
+                elif option == "6":
                     # Exit program
                     print("Exiting program. Thank you for using WGUPS!")
                     break
 
                 else:
-                    print("Invalid selection. Please enter a number between 1 and 4.")
+                    print("Invalid selection. Please enter a number between 1 and 6.")
 
             except ValueError:
                 print("Invalid input. Please enter the correct format.")
 
 # Automatically run when script is executed
 Main()
-
