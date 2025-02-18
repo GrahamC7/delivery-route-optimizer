@@ -223,100 +223,92 @@ truck3.departure_time = min(truck1.time,
                             truck2.time)  # truck 3 will not leave the WGUPS hub until truck1 or truck2 have returned - there are only 2 drivers
 package_delivery(truck3)
 
-
 class Main:
-    # user interface
-    print("WGUPS - Western Governors University Parcel Service")  # user greeting
-    print("Total mileage driven is: ",
-          truck1.miles + truck2.miles + truck3.miles)  # showing total mileage driven by the 3 trucks
+    def __init__(self):
+        self.run()
 
-    # user menu
-    print("Please select an option:")
-    print("1. View status of a specific package")
-    print("2. View which packages are on the way on each truck")
-    print("3. Quit")
-    user_choice = input("Enter your choice: ")
-
-    if user_choice == "1":
-        package_input = input("Enter package ID to check the status (or enter 0 to exit): ")
+    def run(self):
         while True:
+            print("\nWGUPS - Western Governors University Parcel Service")
+            print("=" * 60)
+            print("1. View total mileage traveled by all trucks")
+            print("2. Check the status of a specific package")
+            print("3. Check the status of all packages at a specific time")
+            print("4. Exit program")
+            print("=" * 60)
+
             try:
-                package_id = int(package_input)
-                if package_id == 0:
-                    print("Thank you for using WGUPS. Goodbye!")
+                # Get user selection
+                option = input("Select an option (1-4): ")
+
+                if option == "1":
+                    # Display total mileage of all trucks
+                    total_mileage = truck1.miles + truck2.miles + truck3.miles
+                    print("\nTotal mileage traveled by all trucks: {:.2f} miles".format(total_mileage))
+
+                elif option == "2":
+                    # Check status of a specific package
+                    package_id = int(input("Enter package ID (1-40): "))
+                    package = package_hash.search(package_id)
+
+                    if package:
+                        time_request = input("Enter a time (HH:MM) to check package status: ")
+                        h, m = map(int, time_request.split(":"))
+                        time_change = datetime.timedelta(hours=h, minutes=m)
+                        package.update_status(time_change)
+
+                        # Determine package location
+                        location = package.address if package.status == "Delivered" else "On Truck" if package.status == "On the way" else "WGUPS Hub"
+
+                        # Convert timedelta to HH:MM format
+                        if package.delivery_time:
+                            delivery_time = (datetime.datetime.min + package.delivery_time).time().strftime('%H:%M')
+                        else:
+                            delivery_time = "Not Delivered"
+
+                        print("\nPackage Information")
+                        print("-" * 50)
+                        print(f"Package ID: {package_id}")
+                        print(f"Status: {package.status}")
+                        print(f"Location: {location}")
+                        print(f"Delivery Time: {delivery_time}")
+                        print(f"Deadline: {package.delivery_deadline}")
+                    else:
+                        print("Invalid package ID. Please enter a number between 1 and 40.")
+
+                elif option == "3":
+                    # Check status of all packages at a specific time
+                    time_request = input("Enter a time (HH:MM) to check package statuses: ")
+                    h, m = map(int, time_request.split(":"))
+                    time_change = datetime.timedelta(hours=h, minutes=m)
+
+                    print("\nPackage Status at", time_request)
+                    print("=" * 60)
+
+                    for package_id in range(1, 41):
+                        package = package_hash.search(package_id)
+                        package.update_status(time_change)
+                        location = package.address if package.status == "Delivered" else "On Truck" if package.status == "On the way" else "WGUPS Hub"
+
+                        # Convert timedelta to HH:MM format
+                        if package.delivery_time:
+                            delivery_time = (datetime.datetime.min + package.delivery_time).time().strftime('%H:%M')
+                        else:
+                            delivery_time = "Not Delivered"
+
+                        print(f"Package {package_id}: {package.status} | Location: {location} | Delivery Time: {delivery_time} | Deadline: {package.delivery_deadline}")
+
+                elif option == "4":
+                    # Exit program
+                    print("Exiting program. Thank you for using WGUPS!")
                     break
 
-                package = package_hash.search(package_id)
-                if package is not None:  # only updating status if the package exists
-                    time_request = input("Enter the time in HH:MM format to check status: ")
-                    try:
-                        (h, m) = time_request.split(":")
-                        timeChange = datetime.timedelta(hours=int(h), minutes=int(m))
-                        package.update_status(timeChange)
-                        print(str(package))
-
-                        # Print the truck location based on the package's delivery time
-                        truck_current_location = None
-                        if package_id in truck1.packages:
-                            truck_current_location = truck1.current_location
-                        elif package_id in truck2.packages:
-                            truck_current_location = truck2.current_location
-                        elif package_id in truck3.packages:
-                            truck_current_location = truck3.current_location
-
-                        if truck_current_location:
-                            print(f"Truck current location at {time_request}: {truck_current_location}")
-                        else:
-                            print("Truck location unknown at the specified time.")
-                    except ValueError:
-                        print("Invalid time format. Please use HH:MM format.")
                 else:
-                    print(f"Package ID {package_id} not found in the hash table.")
-                package_input = input("Enter another package ID to check the status (or enter 0 to exit): ")
+                    print("Invalid selection. Please enter a number between 1 and 4.")
+
             except ValueError:
-                print("Invalid input. Please enter a valid Package ID.")
-                package_input = input("Enter package ID to check the status (or enter 0 to exit): ")
+                print("Invalid input. Please enter the correct format.")
 
-    if user_choice == "2":
-        time_request = input("Enter the time in HH:MM format to check package statuses: ")
-        try:
-            (h, m) = time_request.split(":")
-            time_change = datetime.timedelta(hours=int(h), minutes=int(m))
-            print("Packages currently on the way for each truck (en route):")
-            print("Truck 1:")
-            for package_id in truck1.packages:
-                package = package_hash.search(package_id)
-                if package:
-                    package.update_status(time_change)  # Updating package status based on entered time
-                    if package.status == "On the way":
-                        print(
-                            f"Package ID {package.package_id} on the way to {package.address}, ZIP: {package.zip_code}")
-            print("\nTruck 2:")
-            for package_id in truck2.packages:
-                package = package_hash.search(package_id)
-                if package:
-                    package.update_status(time_change)
-                    if package.status == "On the way":
-                        print(str(package))
-            print("\nTruck 3:")
-            for package_id in truck3.packages:
-                package = package_hash.search(package_id)
-                if package:
-                    package.update_status(time_change)
-                    if package.status == "On the way":
-                        print(str(package))
-        except ValueError:
-            print("Invalid time format. Please use HH:MM format.")
+# Automatically run when script is executed
+Main()
 
-        # Return to menu
-        print("\nPlease select another option:")
-        print("1. View status of a specific package")
-        print("2. View which packages are on the way on each truck")
-        print("3. Quit")
-        user_choice = input("Enter your choice: ")
-
-
-    elif user_choice == "3":
-        while True:
-            print("Thank you for using WGUPS. Goodbye!")
-            quit()
