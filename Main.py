@@ -5,17 +5,17 @@ import csv
 import datetime
 
 # loading address.csv file
-with open("CSV_Files/address.csv") as addressCSV:
+with open("data/address.csv") as addressCSV:
     AddressCSV = csv.reader(addressCSV)
     AddressCSV = list(AddressCSV)
 
 # loading distance.csv file
-with open("CSV_Files/distance.csv") as distanceCSV:
+with open("data/distance.csv") as distanceCSV:
     DistanceCSV = csv.reader(distanceCSV)
     DistanceCSV = list(DistanceCSV)
 
 # loading packages.csv file
-with open("CSV_Files/packages.csv") as packagesCSV:
+with open("data/packages.csv") as packagesCSV:
     PackagesCSV = csv.reader(packagesCSV)
     PackagesCSV = list(PackagesCSV)
 
@@ -154,7 +154,7 @@ def address_info(address_main):
 
 
 # loading hash table with packages
-load_packages("CSV_Files/packages.csv", package_hash)
+load_packages("data/packages.csv", package_hash)
 
 
 # creating class for delivery trucks
