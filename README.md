@@ -38,28 +38,6 @@ The simulation delivers packages efficiently, tracks real-time status, and provi
 
 ---
 
-## 📂 Project Structure
-
-delivery-route-optimizer/
-├── data/
-│   ├── address.csv
-│   ├── distance.csv
-│   └── packages.csv
-├── src/
-│   ├── main.py                  # Entry point
-│   ├── interface.py             # Command-line interface
-│   ├── models/
-│   │   ├── hash_table.py
-│   │   ├── package.py
-│   │   └── truck.py
-│   └── logic/
-│       ├── data_loader.py
-│       ├── routing.py
-│       └── helpers.py
-└── README.md
-
----
-
 ## 🚀 How to Run
 
 **Requires:** Python 3.10+
