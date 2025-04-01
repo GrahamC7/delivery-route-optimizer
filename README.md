@@ -107,6 +107,48 @@ https://github.com/GrahamC7
 
 ---
 
+
+---
+
+### 🌐 Flask Web UI
+
+We built a clean, responsive web app using **Flask** + **Bootstrap** so you can interact with the delivery simulation in your browser instead of just the terminal.
+
+#### 📋 Pages & Routes
+
+| Route         | Description |
+|---------------|-------------|
+| `/`           | Main page — enter a package ID and time to view its status |
+| `/packages`   | View the status of **all packages** at a specific time |
+| `/trucks`     | View **each truck’s** mileage, departure time, and delivery progress at a selected time |
+
+#### 🚀 Running the Web App
+
+1. Make sure Flask is installed:
+   ```bash
+   pip install flask
+   ```
+
+2. Run the app:
+   ```bash
+   cd src
+   python app.py
+   ```
+
+3. Open your browser and go to:
+   ```
+   http://127.0.0.1:5000/
+   ```
+
+#### 📸 UI Features
+
+- ✅ Styled with Bootstrap 5
+- ✅ Time input forms with validation
+- ✅ Live delivery status visualization
+- ✅ Truck progress with total mileage and real-time delivery counts
+- ✅ Reusable layout and dynamic Jinja2 templates
+
+
 ## 📄 License
 
 This project is open source under the MIT License.  
