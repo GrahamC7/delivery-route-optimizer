@@ -76,18 +76,6 @@ Deadline     : 10:30
 
 ---
 
-## 👨‍💻 Author
-
-**Graham Cockerham**  
-B.S. in Computer Science  
-Software Engineer with interests in embedded systems, AI, and aerospace applications
-https://github.com/GrahamC7
-
----
-
-
----
-
 ### 🌐 Flask Web UI
 
 We built a clean, responsive web app using **Flask** + **Bootstrap** so you can interact with the delivery simulation in your browser instead of just the terminal.
@@ -126,6 +114,16 @@ We built a clean, responsive web app using **Flask** + **Bootstrap** so you can 
 - ✅ Truck progress with total mileage and real-time delivery counts
 - ✅ Reusable layout and dynamic Jinja2 templates
 
+---
+
+## 👨‍💻 Author
+
+**Graham Cockerham**  
+B.S. in Computer Science  
+Software Engineer with interests in embedded systems, AI, and aerospace applications
+https://github.com/GrahamC7
+
+---
 
 ## 📄 License
 
