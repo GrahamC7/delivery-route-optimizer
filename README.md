@@ -78,8 +78,6 @@ Deadline     : 10:30
 
 ### 🌐 Flask Web UI
 
-We built a clean, responsive web app using **Flask** + **Bootstrap** so you can interact with the delivery simulation in your browser instead of just the terminal.
-
 #### 📋 Pages & Routes
 
 | Route         | Description |
